@@ -32,11 +32,14 @@ export default function SectionsShow({ section, eligibleLeaders = [], allMembers
     );
     const canManageSection = isAdminOrSuper || isSectionSupervisor;
 
-    // Supervisor assigned to this section
-    const currentSupervisorRole = section.user_roles?.find((r) => r.role === 'supervisor');
-    const supervisor = currentSupervisorRole?.user;
+    // Supervisors assigned to this section (supports multiple supervisors)
+    const supervisorRoles = section.user_roles?.filter((r) => r.role === 'supervisor') || [];
+    const supervisors = supervisorRoles.map((r) => ({
+        ...r.user,
+        role_id: r.id,
+    })).filter((s) => Boolean(s.id));
 
-    // 1. Assign / Change Supervisor Modal State
+    // 1. Assign Supervisor Modal State
     const [supervisorModalOpen, setSupervisorModalOpen] = useState(false);
     const {
         data: supervisorData,
@@ -45,7 +48,7 @@ export default function SectionsShow({ section, eligibleLeaders = [], allMembers
         processing: supervisorProcessing,
         reset: resetSupervisor,
     } = useForm({
-        user_id: supervisor?.id || '',
+        user_id: '',
     });
 
     const handleAssignSupervisor = (e) => {
@@ -58,8 +61,8 @@ export default function SectionsShow({ section, eligibleLeaders = [], allMembers
         });
     };
 
-    const handleRemoveSupervisor = (userId) => {
-        if (confirm(`Remove ${supervisor?.full_name} as Supervisor of ${section.name}?`)) {
+    const handleRemoveSupervisor = (userId, userName) => {
+        if (confirm(`Remove ${userName} as Supervisor of ${section.name}?`)) {
             router.delete(route('sections.remove-supervisor', [section.id, userId]));
         }
     };
@@ -168,57 +171,104 @@ export default function SectionsShow({ section, eligibleLeaders = [], allMembers
             <Head title={`${section.name} Section`} />
 
             <div className="space-y-6 max-w-6xl mx-auto">
-                {/* 1. Supervisor Dedicated Management Card */}
+                {/* 1. Dedicated Section Supervisors Management Panel */}
                 <Card padding="p-6" className="bg-gradient-to-r from-purple-50 via-white to-purple-50/40 border-purple-200 shadow-sm">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div className="flex items-start sm:items-center space-x-4">
-                            <div className="h-14 w-14 rounded-3xl bg-[#6B21A8] text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
-                                {supervisor?.full_name ? supervisor.full_name[0] : 'S'}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-purple-100">
+                        <div className="flex items-center space-x-3">
+                            <div className="h-10 w-10 rounded-2xl bg-[#6B21A8] text-white flex items-center justify-center shrink-0 shadow-sm">
+                                <ShieldCheckIcon className="h-5 w-5" />
                             </div>
                             <div>
                                 <div className="flex items-center space-x-2">
-                                    <span className="text-[11px] font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">
-                                        Section Supervisor
+                                    <h3 className="text-lg font-black text-slate-900">
+                                        Section Supervisors
+                                    </h3>
+                                    <span className="text-xs font-mono font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">
+                                        {supervisors.length} Assigned
                                     </span>
-                                    {supervisor?.scout_id && (
-                                        <span className="text-xs font-mono font-bold text-slate-500">
-                                            ID: {supervisor.scout_id}
-                                        </span>
-                                    )}
                                 </div>
-                                <h3 className="text-xl font-black text-slate-900 mt-1">
-                                    {supervisor?.full_name || 'No Supervisor Assigned Yet'}
-                                </h3>
-                                <div className="text-xs text-slate-500 mt-0.5 flex flex-wrap gap-x-4">
-                                    <span>{supervisor?.email || 'Assign a qualified leader/admin as supervisor'}</span>
-                                    {supervisor?.phone && <span>Phone: {supervisor.phone}</span>}
-                                </div>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Supervisors oversee lectures, evaluations, syllabus, and leaders in this section. Super Admin and Admins can assign multiple supervisors.
+                                </p>
                             </div>
                         </div>
 
-                        {/* Supervisor Actions (Admin & Super Admin Authority) */}
                         {isAdminOrSuper && (
-                            <div className="flex items-center space-x-2 shrink-0">
-                                <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => {
-                                        supervisorData.user_id = supervisor?.id || '';
-                                        setSupervisorModalOpen(true);
-                                    }}
-                                >
-                                    <ShieldCheckIcon className="h-4 w-4 mr-1.5" />
-                                    {supervisor ? 'Change Supervisor' : 'Assign Supervisor'}
-                                </Button>
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => {
+                                    supervisorData.user_id = '';
+                                    setSupervisorModalOpen(true);
+                                }}
+                                className="shrink-0"
+                            >
+                                <UserPlusIcon className="h-4 w-4 mr-1.5" />
+                                Add Supervisor
+                            </Button>
+                        )}
+                    </div>
 
-                                {supervisor && (
-                                    <Button
-                                        variant="danger"
-                                        size="sm"
-                                        onClick={() => handleRemoveSupervisor(supervisor.id)}
+                    {/* Supervisors List / Grid */}
+                    <div className="mt-4">
+                        {supervisors.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {supervisors.map((sup) => (
+                                    <div
+                                        key={sup.id}
+                                        className="p-3.5 rounded-2xl bg-white border border-purple-100 flex items-center justify-between shadow-2xs hover:border-purple-200 transition-all"
                                     >
-                                        <UserMinusIcon className="h-4 w-4 mr-1.5" />
-                                        Remove
+                                        <div className="flex items-center space-x-3 min-w-0">
+                                            <div className="h-10 w-10 rounded-xl bg-purple-100 text-[#6B21A8] flex items-center justify-center font-black text-sm shrink-0">
+                                                {sup.full_name ? sup.full_name[0] : 'S'}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="flex items-center space-x-1.5">
+                                                    <span className="font-extrabold text-xs text-slate-900 truncate">
+                                                        {sup.full_name}
+                                                    </span>
+                                                </div>
+                                                <div className="text-[11px] font-mono text-purple-700 font-semibold truncate">
+                                                    {sup.scout_id || sup.email}
+                                                </div>
+                                                {sup.phone && (
+                                                    <div className="text-[10px] text-slate-400">
+                                                        {sup.phone}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {isAdminOrSuper && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveSupervisor(sup.id, sup.full_name)}
+                                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors shrink-0 ml-2"
+                                                title={`Remove ${sup.full_name} from section supervisors`}
+                                            >
+                                                <UserMinusIcon className="h-4 w-4" />
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-6 rounded-2xl bg-white border border-dashed border-purple-200 text-center">
+                                <p className="text-xs text-slate-500 font-medium">
+                                    No supervisors assigned to this section yet.
+                                </p>
+                                {isAdminOrSuper && (
+                                    <Button
+                                        variant="soft"
+                                        size="sm"
+                                        onClick={() => {
+                                            supervisorData.user_id = '';
+                                            setSupervisorModalOpen(true);
+                                        }}
+                                        className="mt-2.5"
+                                    >
+                                        <ShieldCheckIcon className="h-4 w-4 mr-1.5" />
+                                        Assign First Supervisor
                                     </Button>
                                 )}
                             </div>
@@ -383,11 +433,14 @@ export default function SectionsShow({ section, eligibleLeaders = [], allMembers
                         required
                     >
                         <option value="">-- Choose Member --</option>
-                        {allMembers.map((m) => (
-                            <option key={m.id} value={m.id}>
-                                {m.full_name} ({m.scout_id || m.email})
-                            </option>
-                        ))}
+                        {allMembers.map((m) => {
+                            const isAlready = supervisors.some((s) => s.id === m.id);
+                            return (
+                                <option key={m.id} value={m.id} disabled={isAlready}>
+                                    {m.full_name} ({m.scout_id || m.email}){isAlready ? ' (Already Supervisor)' : ''}
+                                </option>
+                            );
+                        })}
                     </Select>
 
                     <div className="flex justify-end space-x-2 pt-2">

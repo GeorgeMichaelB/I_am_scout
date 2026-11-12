@@ -170,4 +170,62 @@ class ExampleTest extends TestCase
         $responseOther = $this->actingAs($scouter)->get("/users/{$otherUser->id}");
         $responseOther->assertStatus(403);
     }
+
+    public function test_import_template_downloads_successfully(): void
+    {
+        $admin = User::where('email', 'admin@scout.com')->first();
+        $response = $this->actingAs($admin)->get('/users/import-template?prefix=ASH-F1');
+        $response->assertStatus(200);
+        $response->assertHeader('content-disposition');
+    }
+
+    public function test_multiple_supervisors_can_be_assigned_to_section(): void
+    {
+        $admin = User::where('email', 'admin@scout.com')->first();
+        $sup1 = User::where('email', 'george@scout.com')->first();
+        $sup2 = User::where('email', 'david@scout.com')->first();
+
+        // Assign sup1 to section 1
+        $this->actingAs($admin)->post('/sections/1/assign-supervisor', ['user_id' => $sup1->id]);
+
+        // Assign sup2 to section 1 (both should remain supervisors)
+        $this->actingAs($admin)->post('/sections/1/assign-supervisor', ['user_id' => $sup2->id]);
+
+        $this->assertDatabaseHas('user_roles', [
+            'user_id' => $sup1->id,
+            'role' => 'supervisor',
+            'section_id' => 1,
+        ]);
+
+        $this->assertDatabaseHas('user_roles', [
+            'user_id' => $sup2->id,
+            'role' => 'supervisor',
+            'section_id' => 1,
+        ]);
+    }
+
+    public function test_multiple_leaders_can_be_assigned_to_feraa(): void
+    {
+        $admin = User::where('email', 'admin@scout.com')->first();
+        $ldr1 = User::where('email', 'george@scout.com')->first();
+        $ldr2 = User::where('email', 'david@scout.com')->first();
+
+        // Assign ldr1 to Fera'a 1
+        $this->actingAs($admin)->post('/feraas/1/assign-leader', ['user_id' => $ldr1->id]);
+
+        // Assign ldr2 to Fera'a 1
+        $this->actingAs($admin)->post('/feraas/1/assign-leader', ['user_id' => $ldr2->id]);
+
+        $this->assertDatabaseHas('user_roles', [
+            'user_id' => $ldr1->id,
+            'role' => 'leader',
+            'feraa_id' => 1,
+        ]);
+
+        $this->assertDatabaseHas('user_roles', [
+            'user_id' => $ldr2->id,
+            'role' => 'leader',
+            'feraa_id' => 1,
+        ]);
+    }
 }

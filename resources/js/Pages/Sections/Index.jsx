@@ -21,7 +21,12 @@ export default function SectionsIndex({ sections = [] }) {
                     {sections.map((section, idx) => {
                         const totalScouters = section.feraas?.reduce((acc, f) => acc + (f.scouters_count || 0), 0) || 0;
                         const totalLeaders = section.feraas?.reduce((acc, f) => acc + (f.leaders_count || 0), 0) || 0;
-                        const supervisor = section.user_roles?.find((r) => r.role === 'supervisor')?.user;
+                        const supervisors = section.user_roles?.filter((r) => r.role === 'supervisor')?.map((r) => r.user).filter(Boolean) || [];
+                        const supervisorText = supervisors.length === 0
+                            ? 'Unassigned'
+                            : supervisors.length === 1
+                                ? supervisors[0].full_name
+                                : `${supervisors[0].full_name} (+${supervisors.length - 1} more)`;
 
                         return (
                             <Link key={section.id} href={route('sections.show', section.id)}>
@@ -49,13 +54,18 @@ export default function SectionsIndex({ sections = [] }) {
 
                                         {/* Section Supervisor Indicator */}
                                         <div className="mt-3 pt-3 border-t border-purple-50">
-                                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                                                Supervisor
-                                            </span>
-                                            <span className="text-xs font-bold text-slate-800 flex items-center mt-0.5">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                                                    Supervisors ({supervisors.length})
+                                                </span>
+                                            </div>
+                                            <span
+                                                className="text-xs font-bold text-slate-800 flex items-center mt-0.5"
+                                                title={supervisors.map((s) => s.full_name).join(', ')}
+                                            >
                                                 <ShieldCheckIcon className="h-3.5 w-3.5 mr-1 text-purple-600 shrink-0" />
                                                 <span className="truncate">
-                                                    {supervisor?.full_name || 'Unassigned'}
+                                                    {supervisorText}
                                                 </span>
                                             </span>
                                         </div>

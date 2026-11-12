@@ -97,13 +97,8 @@ class SectionController extends Controller
             'user_id' => ['required', 'exists:users,id'],
         ]);
 
-        // Remove old supervisor for this section if any
-        UserRole::where('section_id', $section->id)
-            ->where('role', 'supervisor')
-            ->delete();
-
-        // Assign new supervisor
-        UserRole::create([
+        // Assign supervisor (supports multiple supervisors per section)
+        UserRole::firstOrCreate([
             'user_id' => $validated['user_id'],
             'role' => 'supervisor',
             'section_id' => $section->id,
@@ -112,7 +107,7 @@ class SectionController extends Controller
 
         $supervisor = User::find($validated['user_id']);
 
-        return back()->with('success', "{$supervisor->full_name} is now the Supervisor for {$section->name}.");
+        return back()->with('success', "{$supervisor->full_name} assigned as Supervisor for {$section->name}.");
     }
 
     public function removeSupervisor(Request $request, Section $section, User $user)
