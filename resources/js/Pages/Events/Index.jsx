@@ -18,7 +18,7 @@ import {
 export default function EventsIndex({ events, sections = [] }) {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const highestRole = user?.highestRole || 'scouter';
+    const highestRole = user?.highestRole || user?.highest_role || 'scouter';
 
     const canAddEvents = ['dev', 'super_admin', 'admin', 'supervisor'].includes(highestRole);
 

@@ -15,7 +15,7 @@ import {
 export default function LecturesShow({ lecture }) {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const highestRole = user?.highestRole || 'scouter';
+    const highestRole = user?.highestRole || user?.highest_role || 'scouter';
 
     const canDelete = ['dev', 'super_admin', 'admin', 'supervisor'].includes(highestRole);
 

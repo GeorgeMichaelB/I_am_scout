@@ -33,7 +33,12 @@ class HandleInertiaRequests extends Middleware
                     'phone' => $user->phone,
                     'gender' => $user->gender,
                     'avatar' => $user->avatar,
+                    'highestRole' => $user->highestRole(),
                     'highest_role' => $user->highestRole(),
+                    'isAdmin' => in_array($user->highestRole(), ['dev', 'super_admin', 'admin']),
+                    'isSuperAdmin' => in_array($user->highestRole(), ['dev', 'super_admin']),
+                    'isSupervisor' => in_array($user->highestRole(), ['dev', 'super_admin', 'admin', 'supervisor']),
+                    'isLeader' => in_array($user->highestRole(), ['dev', 'super_admin', 'admin', 'supervisor', 'leader']),
                     'roles' => $user->roles->map(function ($r) {
                         return [
                             'id' => $r->id,

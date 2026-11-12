@@ -20,7 +20,7 @@ import {
 export default function UsersIndex({ users, sections = [], filters = {} }) {
     const { auth } = usePage().props;
     const currentUser = auth?.user;
-    const highestRole = currentUser?.highestRole || 'scouter';
+    const highestRole = currentUser?.highestRole || currentUser?.highest_role || 'scouter';
 
     const canCreateOrDelete = ['dev', 'super_admin', 'admin'].includes(highestRole);
 

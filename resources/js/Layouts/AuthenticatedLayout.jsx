@@ -22,7 +22,7 @@ import {
 export default function AuthenticatedLayout({ header, children, actionButton }) {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const highestRole = user?.highestRole || 'scouter';
+    const highestRole = user?.highestRole || user?.highest_role || 'scouter';
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -41,7 +41,7 @@ export default function AuthenticatedLayout({ header, children, actionButton }) 
         { name: 'Announcements', href: route('announcements.index'), icon: MegaphoneIcon, show: true },
         { name: 'Schedule', href: route('calendar'), icon: CalendarDaysIcon, show: true },
         { name: 'Group Chat', href: route('messages.index'), icon: ChatBubbleLeftRightIcon, show: true },
-        { name: 'Roles & Access', href: route('roles.index'), icon: ShieldCheckIcon, show: isSuperAdmin },
+        { name: 'Roles & Access', href: route('roles.index'), icon: ShieldCheckIcon, show: isDevOrAdmin },
         { name: 'Filament Admin', href: '/admin', icon: AdjustmentsHorizontalIcon, show: isSupervisorOrAbove, external: true },
     ].filter((item) => item.show);
 

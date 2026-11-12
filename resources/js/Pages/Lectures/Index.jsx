@@ -20,7 +20,7 @@ import {
 export default function LecturesIndex({ lectures, sections = [] }) {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const highestRole = user?.highestRole || 'scouter';
+    const highestRole = user?.highestRole || user?.highest_role || 'scouter';
 
     const canUpload = ['dev', 'super_admin', 'admin', 'supervisor', 'leader'].includes(highestRole);
 

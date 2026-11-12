@@ -11,7 +11,7 @@ import { ArrowLeftIcon, PencilSquareIcon, CheckIcon, ShieldCheckIcon } from '@he
 export default function UsersShow({ scouter, sections = [] }) {
     const { auth } = usePage().props;
     const currentUser = auth?.user;
-    const highestRole = currentUser?.highestRole || 'scouter';
+    const highestRole = currentUser?.highestRole || currentUser?.highest_role || 'scouter';
 
     const [isEditing, setIsEditing] = useState(false);
 

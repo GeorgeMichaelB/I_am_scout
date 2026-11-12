@@ -27,7 +27,7 @@ export default function Dashboard({
 }) {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const highestRole = user?.highestRole || 'scouter';
+    const highestRole = user?.highestRole || user?.highest_role || 'scouter';
 
     const isLeaderOrAbove = ['dev', 'super_admin', 'admin', 'supervisor', 'leader'].includes(highestRole);
 

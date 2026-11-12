@@ -24,7 +24,7 @@ import {
 export default function SectionsShow({ section, eligibleLeaders = [], allMembers = [] }) {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const highestRole = user?.highestRole || 'scouter';
+    const highestRole = user?.highestRole || user?.highest_role || 'scouter';
 
     const isAdminOrSuper = ['dev', 'super_admin', 'admin'].includes(highestRole);
     const isSectionSupervisor = user?.roles?.some(

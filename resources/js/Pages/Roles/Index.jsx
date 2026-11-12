@@ -19,12 +19,16 @@ import {
     SparklesIcon,
 } from '@heroicons/react/24/outline';
 
-export default function RolesIndex({ users, sections = [], filters = {} }) {
+export default function RolesIndex({ users, sections = [], filters = {}, allUsers = [] }) {
     const { auth } = usePage().props;
     const currentUser = auth?.user;
+    const highestRole = currentUser?.highestRole || currentUser?.highest_role || 'scouter';
+    const isSuperOrDev = ['dev', 'super_admin'].includes(highestRole);
 
     const [search, setSearch] = useState(filters.search || '');
     const [selectedRoleFilter, setSelectedRoleFilter] = useState(filters.role || '');
+
+    const memberList = allUsers.length > 0 ? allUsers : (users.data || []);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -139,11 +143,15 @@ export default function RolesIndex({ users, sections = [], filters = {} }) {
                             <ShieldCheckIcon className="h-9 w-9 text-purple-300 shrink-0 mt-0.5" />
                             <div>
                                 <span className="text-[10px] font-black uppercase tracking-widest text-purple-300">
-                                    Super Admin Control Center
+                                    {isSuperOrDev ? 'Super Admin Authority Center' : 'Scout Admin Authority Center'}
                                 </span>
-                                <h3 className="text-xl font-black mt-0.5">Account Roles, Upgrades & Cross-Team Teams</h3>
+                                <h3 className="text-xl font-black mt-0.5">
+                                    {isSuperOrDev ? 'Account Roles, System Ranks & Team Assignments' : 'Section Supervisors & Fera\'a Leader Assignments'}
+                                </h3>
                                 <p className="text-xs text-purple-200/90 mt-1 max-w-2xl leading-relaxed">
-                                    Control every account in the scout group. Upgrade or downgrade accounts, assign section supervisors, or assign members as leaders in one section while they remain scouters in another team (e.g. Gawala).
+                                    {isSuperOrDev
+                                        ? 'Full account authority. Upgrade or downgrade any account, assign Section Supervisors and Fera\'a Leaders, or configure cross-team roles (e.g. Leader in Ashbal and Scouter in Gawala).'
+                                        : 'Assign Section Supervisors to sections, assign Leaders from Gawala / Morashahen to Fera\'as, or manage member team roles.'}
                                 </p>
                             </div>
                         </div>
@@ -210,7 +218,7 @@ export default function RolesIndex({ users, sections = [], filters = {} }) {
                                     <th className="py-3.5 px-4">Full Name</th>
                                     <th className="py-3.5 px-4">Email</th>
                                     <th className="py-3.5 px-4">Current Team Roles & Assignments</th>
-                                    <th className="py-3.5 px-4 text-right">Super Admin Authority</th>
+                                    <th className="py-3.5 px-4 text-right">Authority Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-purple-50">
@@ -321,9 +329,13 @@ export default function RolesIndex({ users, sections = [], filters = {} }) {
                         <option value="scouter">Scouter (Basic Scout - Calendar, Syllabus, Chat)</option>
                         <option value="leader">Leader (Attendance, Evaluations, Ta7der, View Scouters)</option>
                         <option value="supervisor">Supervisor (Section Syllabus, View Evaluations, Assign Leaders)</option>
-                        <option value="admin">Admin (All Sections, Create/Delete Accounts, General Directives, Schedule)</option>
-                        <option value="super_admin">Super Admin (All Admin Powers + Role Upgrades/Downgrades)</option>
-                        <option value="dev">Dev (Unrestricted Full Access)</option>
+                        {isSuperOrDev && (
+                            <>
+                                <option value="admin">Admin (All Sections, Create/Delete Accounts, General Directives, Schedule)</option>
+                                <option value="super_admin">Super Admin (All Admin Powers + Role Upgrades/Downgrades)</option>
+                                <option value="dev">Dev (Unrestricted Full Access)</option>
+                            </>
+                        )}
                     </Select>
 
                     {/* Section Assignment if Supervisor or Leader or Scouter */}
@@ -426,7 +438,7 @@ export default function RolesIndex({ users, sections = [], filters = {} }) {
                         required
                     >
                         <option value="">-- Choose Member --</option>
-                        {users.data?.map((m) => (
+                        {memberList.map((m) => (
                             <option key={m.id} value={m.id}>
                                 {m.full_name} ({m.scout_id || m.email})
                             </option>
@@ -442,8 +454,12 @@ export default function RolesIndex({ users, sections = [], filters = {} }) {
                         <option value="leader">Leader</option>
                         <option value="supervisor">Supervisor</option>
                         <option value="scouter">Scouter</option>
-                        <option value="admin">Admin</option>
-                        <option value="super_admin">Super Admin</option>
+                        {isSuperOrDev && (
+                            <>
+                                <option value="admin">Admin</option>
+                                <option value="super_admin">Super Admin</option>
+                            </>
+                        )}
                     </Select>
 
                     <Select

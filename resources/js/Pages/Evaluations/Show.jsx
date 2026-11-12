@@ -16,7 +16,7 @@ import {
 export default function EvaluationsShow({ evaluation, scouterEntries = [] }) {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const highestRole = user?.highestRole || 'scouter';
+    const highestRole = user?.highestRole || user?.highest_role || 'scouter';
 
     const canEdit = ['dev', 'super_admin', 'admin', 'supervisor', 'leader'].includes(highestRole);
 

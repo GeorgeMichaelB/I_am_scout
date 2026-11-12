@@ -58,22 +58,7 @@ class User extends Authenticatable implements FilamentUser, HasName
         return $this->hasMany(UserRole::class);
     }
 
-    public function hasRole(string $role, ?int $sectionId = null, ?int $feraaId = null): bool
-    {
-        $query = $this->roles()->where('role', $role);
-
-        if ($sectionId !== null) {
-            $query->where('section_id', $sectionId);
-        }
-
-        if ($feraaId !== null) {
-            $query->where('feraa_id', $feraaId);
-        }
-
-        return $query->exists();
-    }
-
-    public function highestRole(): ?string
+    public function highestRole(): string
     {
         $priority = ['dev', 'super_admin', 'admin', 'supervisor', 'leader', 'scouter'];
 
@@ -85,6 +70,69 @@ class User extends Authenticatable implements FilamentUser, HasName
             }
         }
 
-        return null;
+        return 'scouter';
+    }
+
+    public function hasRole(string $role, ?int $sectionId = null, ?int $feraaId = null): bool
+    {
+        $highest = $this->highestRole();
+
+        // Dev and Super Admin possess universal authority
+        if (in_array($highest, ['dev', 'super_admin'])) {
+            return true;
+        }
+
+        // Admin has full scouting group authority across sections and feraas
+        if ($highest === 'admin') {
+            return in_array($role, ['admin', 'supervisor', 'leader', 'scouter']);
+        }
+
+        // Supervisor has supervisor, leader, and scouter authority within their section
+        if ($highest === 'supervisor') {
+            if ($sectionId === null) {
+                return in_array($role, ['supervisor', 'leader', 'scouter']);
+            }
+
+            $isSupervisorOfSection = $this->roles()
+                ->where('role', 'supervisor')
+                ->where('section_id', $sectionId)
+                ->exists();
+
+            if ($isSupervisorOfSection) {
+                return in_array($role, ['supervisor', 'leader', 'scouter']);
+            }
+        }
+
+        // Leader has leader and scouter authority within their feraa
+        if ($highest === 'leader') {
+            if ($sectionId === null && $feraaId === null) {
+                return in_array($role, ['leader', 'scouter']);
+            }
+
+            $query = $this->roles()->where('role', 'leader');
+            if ($sectionId !== null) {
+                $query->where('section_id', $sectionId);
+            }
+            if ($feraaId !== null) {
+                $query->where('feraa_id', $feraaId);
+            }
+
+            if ($query->exists()) {
+                return in_array($role, ['leader', 'scouter']);
+            }
+        }
+
+        // Direct record match in user_roles
+        $query = $this->roles()->where('role', $role);
+
+        if ($sectionId !== null) {
+            $query->where('section_id', $sectionId);
+        }
+
+        if ($feraaId !== null) {
+            $query->where('feraa_id', $feraaId);
+        }
+
+        return $query->exists();
     }
 }
