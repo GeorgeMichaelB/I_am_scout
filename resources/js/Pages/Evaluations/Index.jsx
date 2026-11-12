@@ -59,7 +59,7 @@ export default function EvaluationsIndex({
     const handleToggleLeaderAccess = (leaderRoleId, accessType) => {
         router.post(
             route('evaluations.toggle-leader-access', leaderRoleId),
-            { access_type: accessType },
+            { leader_role_id: leaderRoleId, access_type: accessType },
             { preserveScroll: true }
         );
     };
@@ -370,6 +370,9 @@ export default function EvaluationsIndex({
                         required
                     >
                         <option value="">Choose Fera'a</option>
+                        {isSupervisorOrAbove && (
+                            <option value="all">-- All Fera'as (Create Camp Sheet for All) --</option>
+                        )}
                         {feraas.map((f) => (
                             <option key={f.id} value={f.id}>
                                 {f.name} ({f.section?.name})

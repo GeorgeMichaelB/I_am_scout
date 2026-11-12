@@ -89,6 +89,8 @@ class DashboardController extends Controller
             ];
         }
 
+        $scoreStats = $user->getScoutScoreStats();
+
         return Inertia::render('Dashboard', [
             'stats' => $stats,
             'sections' => $sections,
@@ -97,6 +99,7 @@ class DashboardController extends Controller
             'myFeraa' => $myFeraa,
             'recentLectures' => $recentLectures,
             'activeEvaluation' => $activeEvaluation,
+            'scoreStats' => $scoreStats,
         ]);
     }
 }

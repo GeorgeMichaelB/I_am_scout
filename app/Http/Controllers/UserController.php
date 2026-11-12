@@ -156,10 +156,12 @@ class UserController extends Controller
 
         $user->load(['roles.section', 'roles.feraa']);
         $sections = Section::with('feraas')->orderBy('display_order')->get();
+        $scoreStats = $user->getScoutScoreStats();
 
         return Inertia::render('Users/Show', [
             'scouter' => $user,
             'sections' => $sections,
+            'scoreStats' => $scoreStats,
         ]);
     }
 

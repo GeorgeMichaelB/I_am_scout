@@ -108,6 +108,42 @@ class EvaluationController extends Controller
     {
         $currentUser = $request->user();
         $highestRole = $currentUser->highestRole();
+        $isSupervisorOrAbove = in_array($highestRole, ['dev', 'super_admin', 'admin', 'supervisor']);
+
+        // Allow supervisors and admins to generate camp evaluations for all Fera'as at once
+        if ($request->input('feraa_id') === 'all' && $isSupervisorOrAbove) {
+            $validated = $request->validate([
+                'type' => ['required', 'in:weekly,camp'],
+                'camp_name' => ['nullable', 'string', 'max:255'],
+                'week_date' => ['required', 'date'],
+                'is_active' => ['boolean'],
+                'section_id' => ['nullable', 'exists:sections,id'],
+            ]);
+
+            $feraasQuery = Feraa::query();
+            if ($highestRole === 'supervisor') {
+                $secIds = $currentUser->roles()->where('role', 'supervisor')->pluck('section_id')->filter();
+                $feraasQuery->whereIn('section_id', $secIds);
+            } elseif ($request->filled('section_id')) {
+                $feraasQuery->where('section_id', $request->section_id);
+            }
+
+            $targetFeraas = $feraasQuery->get();
+            foreach ($targetFeraas as $f) {
+                WeeklyEvaluation::firstOrCreate([
+                    'feraa_id' => $f->id,
+                    'type' => $validated['type'],
+                    'week_date' => $validated['week_date'],
+                ], [
+                    'camp_name' => $validated['type'] === 'camp' ? ($validated['camp_name'] ?: 'Scout Camp') : null,
+                    'is_active' => $validated['is_active'] ?? true,
+                    'created_by' => $currentUser->id,
+                ]);
+            }
+
+            $campTitle = $validated['camp_name'] ?: 'Camp';
+            return redirect()->route('evaluations.index')->with('success', "{$campTitle} evaluations created for all {$targetFeraas->count()} Fera'as.");
+        }
 
         $validated = $request->validate([
             'feraa_id' => ['required', 'exists:feraas,id'],
@@ -304,8 +340,13 @@ class EvaluationController extends Controller
         return back()->with('success', 'Evaluations and scores saved successfully.');
     }
 
-    public function toggleLeaderAccess(Request $request, UserRole $userRole)
+    public function toggleLeaderAccess(Request $request, ?UserRole $userRole = null)
     {
+        if (!$userRole) {
+            $roleId = $request->input('leader_role_id') ?? $request->input('user_role_id');
+            $userRole = UserRole::findOrFail($roleId);
+        }
+
         $currentUser = $request->user();
         $highestRole = $currentUser->highestRole();
 

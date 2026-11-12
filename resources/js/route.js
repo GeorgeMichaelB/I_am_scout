@@ -18,7 +18,11 @@ export function route(name, params = {}, absolute = false) {
     const routeDef = Ziggy.routes[name];
     if (!routeDef) {
         console.warn(`Route "${name}" not found in Ziggy routes`);
-        return '/' + name.replace(/\./g, '/');
+        const base = '/' + name.replace(/\./g, '/');
+        if (typeof params === 'string' || typeof params === 'number') {
+            return `${base}/${params}`;
+        }
+        return base;
     }
 
     let uri = routeDef.uri;

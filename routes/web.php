@@ -66,7 +66,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/evaluations/{evaluation}', [EvaluationController::class, 'show'])->name('evaluations.show');
     Route::put('/evaluations/{evaluation}/toggle', [EvaluationController::class, 'toggleActive'])->name('evaluations.toggle');
     Route::post('/evaluations/{evaluation}/entries', [EvaluationController::class, 'storeEntry'])->name('evaluations.entries');
-    Route::post('/evaluations/toggle-leader-access/{userRole}', [EvaluationController::class, 'toggleLeaderAccess'])->name('evaluations.toggle-leader-access');
+    Route::post('/evaluations/toggle-leader-access/{userRole?}', [EvaluationController::class, 'toggleLeaderAccess'])->name('evaluations.toggle-leader-access');
 
     // Ta7der
     Route::get('/ta7der', [Ta7derController::class, 'index'])->name('ta7der.index');

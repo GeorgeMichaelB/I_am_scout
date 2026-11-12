@@ -24,6 +24,7 @@ export default function Dashboard({
     myFeraa = null,
     recentLectures = [],
     activeEvaluation = null,
+    scoreStats = null,
 }) {
     const { auth } = usePage().props;
     const user = auth?.user;
@@ -81,6 +82,26 @@ export default function Dashboard({
                                 </div>
                             </Card>
 
+                            <Card padding="p-5" className="bg-gradient-to-br from-purple-50/70 via-white to-purple-50/30">
+                                <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Scout Score</div>
+                                <div className="text-2xl font-black text-[#6B21A8] font-mono mt-2">
+                                    {scoreStats?.overall_score ?? 100}%
+                                </div>
+                                <div className="text-xs text-purple-700 font-semibold mt-1">
+                                    {scoreStats?.rank_tier || 'First Class Scout'}
+                                </div>
+                            </Card>
+
+                            <Card padding="p-5" className="bg-gradient-to-br from-emerald-50/70 to-white">
+                                <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Attendance Rate</div>
+                                <div className="text-2xl font-black text-emerald-800 font-mono mt-2">
+                                    {scoreStats?.attendance_rate ?? 100}%
+                                </div>
+                                <div className="text-xs text-emerald-600 mt-1">
+                                    {scoreStats?.total_evaluations ?? 0} assessed sessions
+                                </div>
+                            </Card>
+
                             <Card padding="p-5" className="bg-gradient-to-br from-rose-50/70 to-white">
                                 <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Next Event</div>
                                 <div className="text-xl font-black text-slate-800 mt-2 truncate">
@@ -89,22 +110,6 @@ export default function Dashboard({
                                 <div className="text-xs text-slate-500 mt-1">
                                     {upcomingEvents[0]?.start_time ? new Date(upcomingEvents[0].start_time).toLocaleDateString() : 'This Friday'}
                                 </div>
-                            </Card>
-
-                            <Card padding="p-5" className="bg-gradient-to-br from-emerald-50/70 to-white">
-                                <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Lectures</div>
-                                <div className="text-2xl font-black text-emerald-800 mt-2">
-                                    {recentLectures.length}
-                                </div>
-                                <div className="text-xs text-emerald-600 mt-1">Available for review</div>
-                            </Card>
-
-                            <Card padding="p-5" className="bg-gradient-to-br from-blue-50/70 to-white">
-                                <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Notice Board</div>
-                                <div className="text-2xl font-black text-blue-900 mt-2">
-                                    {announcements.length}
-                                </div>
-                                <div className="text-xs text-blue-600 mt-1">Recent updates</div>
                             </Card>
                         </>
                     ) : (

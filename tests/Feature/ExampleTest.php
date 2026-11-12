@@ -306,4 +306,84 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_toggle_leader_access_works_via_body_parameter(): void
+    {
+        $supervisor = User::where('email', 'supervisor@scout.com')->first();
+        $leader = User::where('email', 'leader@scout.com')->first();
+        $leaderRole = $leader->roles->where('role', 'leader')->first();
+
+        // Call without path param, using leader_role_id in payload
+        $response = $this->actingAs($supervisor)->post('/evaluations/toggle-leader-access', [
+            'leader_role_id' => $leaderRole->id,
+            'access_type' => 'camp',
+        ]);
+
+        $response->assertSessionHas('success');
+        $this->assertFalse((bool)$leaderRole->fresh()->can_evaluate_camp);
+    }
+
+    public function test_scout_score_stats_managed_across_weekly_and_camp_evaluations(): void
+    {
+        $admin = User::where('email', 'admin@scout.com')->first();
+        $scouter = User::where('email', 'mark@scout.com')->first();
+        \App\Models\EvaluationEntry::where('scouter_id', $scouter->id)->delete();
+
+        // 1. Weekly evaluation: 1 infraction (Bad Hair: -15) -> score 85
+        $weeklyEval = \App\Models\WeeklyEvaluation::create([
+            'feraa_id' => 1,
+            'type' => 'weekly',
+            'week_date' => '2026-06-01',
+            'is_active' => true,
+            'created_by' => $admin->id,
+        ]);
+        $this->actingAs($admin)->post("/evaluations/{$weeklyEval->id}/entries", [
+            'entries' => [
+                ['scouter_id' => $scouter->id, 'hair' => true, 'trousers' => false, 'clothes' => false, 'rope' => false, 'missed_lectures' => 0],
+            ],
+        ]);
+
+        // 2. Camp evaluation: Clean inspection -> score 100
+        $campEval = \App\Models\WeeklyEvaluation::create([
+            'feraa_id' => 1,
+            'type' => 'camp',
+            'camp_name' => 'Mount Sinai Camp',
+            'week_date' => '2026-06-15',
+            'is_active' => true,
+            'created_by' => $admin->id,
+        ]);
+        $this->actingAs($admin)->post("/evaluations/{$campEval->id}/entries", [
+            'entries' => [
+                ['scouter_id' => $scouter->id, 'hair' => false, 'clothes' => false, 'tent_bad' => false, 'rope' => false, 'missed_lectures' => 0],
+            ],
+        ]);
+
+        $stats = $scouter->getScoutScoreStats();
+        $this->assertEquals(2, $stats['total_evaluations']);
+        $this->assertEquals(85, $stats['weekly_average']);
+        $this->assertEquals(100, $stats['camp_average']);
+        $this->assertEquals(93, $stats['overall_score']); // (85 + 100) / 2 = 92.5 rounded to 93
+        $this->assertEquals(100, $stats['attendance_rate']);
+    }
+
+    public function test_supervisor_can_create_camp_evaluations_for_all_feraas(): void
+    {
+        $supervisor = User::where('email', 'supervisor@scout.com')->first();
+
+        // Supervisor of Ashbal (section 1) creates camp evaluation for all Fera'as in section
+        $response = $this->actingAs($supervisor)->post('/evaluations', [
+            'feraa_id' => 'all',
+            'type' => 'camp',
+            'camp_name' => 'Wadi Natrun Spring Camp',
+            'week_date' => '2026-05-20',
+            'is_active' => true,
+        ]);
+
+        $response->assertRedirect('/evaluations');
+        $this->assertDatabaseHas('weekly_evaluations', [
+            'type' => 'camp',
+            'camp_name' => 'Wadi Natrun Spring Camp',
+            'feraa_id' => 1,
+        ]);
+    }
 }
