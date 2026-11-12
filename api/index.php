@@ -21,6 +21,13 @@ foreach ($directories as $dir) {
     }
 }
 
+// Copy seeded sqlite database to writable /tmp if using sqlite
+$sourceDb = __DIR__ . '/../database/database.sqlite';
+$targetDb = '/tmp/database.sqlite';
+if (!file_exists($targetDb) && file_exists($sourceDb)) {
+    copy($sourceDb, $targetDb);
+}
+
 // Forward to public/index.php
 require __DIR__ . '/../public/index.php';
 
