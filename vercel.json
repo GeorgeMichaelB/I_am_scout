@@ -4,7 +4,7 @@
   "outputDirectory": "public",
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.7.3"
+      "runtime": "vercel-php@0.9.0"
     }
   },
   "routes": [
@@ -28,6 +28,7 @@
   "env": {
     "APP_ENV": "production",
     "APP_DEBUG": "false",
+    "APP_KEY": "base64:1R8oqyCeqBsrzNDcTzFc92n+5M1f9EQ/7A+ZjWV8Eag=",
     "APP_CONFIG_CACHE": "/tmp/bootstrap/cache/config.php",
     "APP_EVENTS_CACHE": "/tmp/bootstrap/cache/events.php",
     "APP_PACKAGES_CACHE": "/tmp/bootstrap/cache/packages.php",
