@@ -1,9 +1,47 @@
-@import 'tailwindcss';
-
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+@import "tailwindcss";
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --color-scout-950: #3B0764;
+    --color-scout-900: #581C87;
+    --color-scout-800: #6B21A8;
+    --color-scout-700: #7E22CE;
+    --color-scout-600: #9333EA;
+    --color-scout-500: #A855F7;
+    --color-scout-400: #C084FC;
+    --color-scout-300: #D8B4FE;
+    --color-scout-200: #E9D5FF;
+    --color-scout-100: #F3E8FF;
+    --color-scout-50: #FAF5FF;
+    --color-navy-800: #1E3A5F;
+    --color-navy-700: #2C4F7C;
+    --color-navy-600: #3B6499;
+    --color-beige-100: #F5F0EB;
+    --color-beige-200: #E8DFD5;
+    --color-rose-100: #FCE7F3;
+    --color-rose-200: #FBCFE8;
+    --color-sage-100: #DCFCE7;
+    --color-sage-200: #BBF7D0;
+}
+
+/* Custom smooth styling */
+body {
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #DDD6FE;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #A78BFA;
 }
