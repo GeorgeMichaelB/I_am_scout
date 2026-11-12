@@ -21,6 +21,11 @@ class UserController extends Controller
         $currentUser = $request->user();
         $highestRole = $currentUser->highestRole();
 
+        // Scouters are strictly forbidden from viewing the scouters list
+        if ($highestRole === 'scouter') {
+            abort(403, 'Scouters are not authorized to view the member directory.');
+        }
+
         $query = User::with(['roles.section', 'roles.feraa']);
 
         // Scope data access based on role
@@ -33,12 +38,6 @@ class UserController extends Controller
             $supervisorSectionIds = $currentUser->roles->where('role', 'supervisor')->pluck('section_id')->filter();
             $query->whereHas('roles', function ($q) use ($supervisorSectionIds) {
                 $q->whereIn('section_id', $supervisorSectionIds);
-            });
-        } elseif ($highestRole === 'scouter') {
-            // Scouter can only see users in their same Fera'a
-            $scouterFeraaIds = $currentUser->roles->where('role', 'scouter')->pluck('feraa_id')->filter();
-            $query->whereHas('roles', function ($q) use ($scouterFeraaIds) {
-                $q->whereIn('feraa_id', $scouterFeraaIds);
             });
         }
 
@@ -145,8 +144,16 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 
-    public function show(User $user): Response
+    public function show(Request $request, User $user): Response
     {
+        $currentUser = $request->user();
+        $highestRole = $currentUser->highestRole();
+
+        // Scouters can only view their own profile
+        if ($highestRole === 'scouter' && $currentUser->id !== $user->id) {
+            abort(403, 'Unauthorized to view this profile.');
+        }
+
         $user->load(['roles.section', 'roles.feraa']);
         $sections = Section::with('feraas')->orderBy('display_order')->get();
 

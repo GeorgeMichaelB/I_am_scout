@@ -149,4 +149,25 @@ class ExampleTest extends TestCase
 
         $response->assertSessionHas('success');
     }
+
+    public function test_scouter_cannot_access_scouter_directory(): void
+    {
+        $scouter = User::where('email', 'scouter@scout.com')->first();
+        $response = $this->actingAs($scouter)->get('/users');
+        $response->assertStatus(403);
+    }
+
+    public function test_scouter_can_view_own_profile_but_not_others(): void
+    {
+        $scouter = User::where('email', 'scouter@scout.com')->first();
+        $otherUser = User::where('email', 'admin@scout.com')->first();
+
+        // Own profile -> 200
+        $response = $this->actingAs($scouter)->get("/users/{$scouter->id}");
+        $response->assertStatus(200);
+
+        // Other profile -> 403
+        $responseOther = $this->actingAs($scouter)->get("/users/{$otherUser->id}");
+        $responseOther->assertStatus(403);
+    }
 }

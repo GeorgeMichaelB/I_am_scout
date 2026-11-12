@@ -45,11 +45,11 @@ export default function UsersShow({ scouter, sections = [] }) {
             <div className="max-w-4xl mx-auto space-y-6">
                 <div className="flex items-center justify-between">
                     <Link
-                        href={route('users.index')}
+                        href={isLeaderOrAbove ? route('users.index') : route('dashboard')}
                         className="inline-flex items-center text-xs font-semibold text-slate-500 hover:text-scout-800"
                     >
                         <ArrowLeftIcon className="h-4 w-4 mr-1" />
-                        Back to Scouter Directory
+                        {isLeaderOrAbove ? 'Back to Scouter Directory' : 'Back to Dashboard'}
                     </Link>
 
                     <Button

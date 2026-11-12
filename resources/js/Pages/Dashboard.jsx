@@ -324,12 +324,21 @@ export default function Dashboard({
                                 >
                                     Group Chat
                                 </Link>
-                                <Link
-                                    href={route('users.index')}
-                                    className="p-3 rounded-2xl bg-white border border-purple-100 hover:border-purple-300 text-slate-700 hover:text-scout-900 text-center shadow-xs transition-all"
-                                >
-                                    Scouters List
-                                </Link>
+                                {isLeaderOrAbove ? (
+                                    <Link
+                                        href={route('users.index')}
+                                        className="p-3 rounded-2xl bg-white border border-purple-100 hover:border-purple-300 text-slate-700 hover:text-scout-900 text-center shadow-xs transition-all"
+                                    >
+                                        Scouters List
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href={route('announcements.index')}
+                                        className="p-3 rounded-2xl bg-white border border-purple-100 hover:border-purple-300 text-slate-700 hover:text-scout-900 text-center shadow-xs transition-all"
+                                    >
+                                        Notice Board
+                                    </Link>
+                                )}
                                 <Link
                                     href={route('lectures.index')}
                                     className="p-3 rounded-2xl bg-white border border-purple-100 hover:border-purple-300 text-slate-700 hover:text-scout-900 text-center shadow-xs transition-all"

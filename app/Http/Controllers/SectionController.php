@@ -14,6 +14,11 @@ class SectionController extends Controller
 {
     public function index(Request $request): Response
     {
+        $currentUser = $request->user();
+        if ($currentUser->highestRole() === 'scouter') {
+            abort(403, 'Scouters are not authorized to view sections.');
+        }
+
         $sections = Section::with([
             'feraas' => function ($q) {
                 $q->withCount([
@@ -35,6 +40,11 @@ class SectionController extends Controller
 
     public function show(Request $request, Section $section): Response
     {
+        $currentUser = $request->user();
+        if ($currentUser->highestRole() === 'scouter') {
+            abort(403, 'Scouters are not authorized to view section details.');
+        }
+
         $section->load([
             'feraas.userRoles.user',
             'userRoles' => function ($q) {

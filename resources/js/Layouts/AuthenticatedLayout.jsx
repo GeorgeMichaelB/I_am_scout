@@ -34,7 +34,7 @@ export default function AuthenticatedLayout({ header, children, actionButton }) 
     const navigation = [
         { name: 'Dashboard', href: route('dashboard'), icon: HomeIcon, show: true },
         { name: 'Sections', href: route('sections.index'), icon: Squares2X2Icon, show: isSupervisorOrAbove },
-        { name: 'Scouters', href: route('users.index'), icon: UsersIcon, show: true },
+        { name: 'Scouters', href: route('users.index'), icon: UsersIcon, show: isLeaderOrAbove },
         { name: 'Lectures', href: route('lectures.index'), icon: BookOpenIcon, show: true },
         { name: 'Evaluations', href: route('evaluations.index'), icon: ClipboardDocumentCheckIcon, show: isLeaderOrAbove },
         { name: 'Ta7der', href: route('ta7der.index'), icon: DocumentTextIcon, show: isLeaderOrAbove },
