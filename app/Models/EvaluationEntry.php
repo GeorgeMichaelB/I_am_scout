@@ -9,7 +9,18 @@ class EvaluationEntry extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['evaluation_id', 'scouter_id', 'hair', 'trousers', 'clothes', 'rope', 'missed_lectures'];
+    protected $fillable = [
+        'evaluation_id',
+        'scouter_id',
+        'hair',
+        'trousers',
+        'clothes',
+        'rope',
+        'tent_bad',
+        'missed_lectures',
+        'score',
+        'notes',
+    ];
 
     protected function casts(): array
     {
@@ -18,6 +29,9 @@ class EvaluationEntry extends Model
             'trousers' => 'boolean',
             'clothes' => 'boolean',
             'rope' => 'boolean',
+            'tent_bad' => 'boolean',
+            'missed_lectures' => 'integer',
+            'score' => 'integer',
         ];
     }
 

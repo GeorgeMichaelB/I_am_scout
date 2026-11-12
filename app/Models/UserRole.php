@@ -9,7 +9,22 @@ class UserRole extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'role', 'section_id', 'feraa_id'];
+    protected $fillable = [
+        'user_id',
+        'role',
+        'section_id',
+        'feraa_id',
+        'can_evaluate_weekly',
+        'can_evaluate_camp',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'can_evaluate_weekly' => 'boolean',
+            'can_evaluate_camp' => 'boolean',
+        ];
+    }
 
     public function user()
     {

@@ -9,13 +9,22 @@ class WeeklyEvaluation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['feraa_id', 'week_date', 'is_active', 'created_by'];
+    protected $fillable = [
+        'feraa_id',
+        'type',
+        'camp_name',
+        'week_date',
+        'is_active',
+        'is_locked',
+        'created_by',
+    ];
 
     protected function casts(): array
     {
         return [
             'week_date' => 'date',
             'is_active' => 'boolean',
+            'is_locked' => 'boolean',
         ];
     }
 

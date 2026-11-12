@@ -228,4 +228,82 @@ class ExampleTest extends TestCase
             'feraa_id' => 1,
         ]);
     }
+
+    public function test_bad_hair_checkbox_deducts_from_score(): void
+    {
+        $admin = User::where('email', 'admin@scout.com')->first();
+        $scouter = User::where('email', 'scouter@scout.com')->first();
+
+        $evaluation = \App\Models\WeeklyEvaluation::create([
+            'feraa_id' => 1,
+            'type' => 'weekly',
+            'week_date' => '2026-05-01',
+            'is_active' => true,
+            'created_by' => $admin->id,
+        ]);
+
+        // Submit with hair = true (Bad Hair infraction)
+        $this->actingAs($admin)->post("/evaluations/{$evaluation->id}/entries", [
+            'entries' => [
+                [
+                    'scouter_id' => $scouter->id,
+                    'hair' => true,
+                    'trousers' => false,
+                    'clothes' => false,
+                    'rope' => false,
+                    'missed_lectures' => 0,
+                ],
+            ],
+        ]);
+
+        $this->assertDatabaseHas('evaluation_entries', [
+            'evaluation_id' => $evaluation->id,
+            'scouter_id' => $scouter->id,
+            'hair' => 1,
+            'score' => 85, // 100 - 15 = 85
+        ]);
+    }
+
+    public function test_camp_evaluation_can_be_created_and_scored(): void
+    {
+        $admin = User::where('email', 'admin@scout.com')->first();
+
+        $response = $this->actingAs($admin)->post('/evaluations', [
+            'feraa_id' => 1,
+            'type' => 'camp',
+            'camp_name' => 'Annual Summer Camp',
+            'week_date' => '2026-07-15',
+            'is_active' => true,
+        ]);
+
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('weekly_evaluations', [
+            'type' => 'camp',
+            'camp_name' => 'Annual Summer Camp',
+        ]);
+    }
+
+    public function test_supervisor_can_toggle_leader_evaluation_access(): void
+    {
+        $supervisor = User::where('email', 'supervisor@scout.com')->first();
+        $leader = User::where('email', 'leader@scout.com')->first();
+        $leaderRole = $leader->roles->where('role', 'leader')->first();
+
+        // Supervisor toggles weekly evaluation access to false
+        $this->actingAs($supervisor)->post("/evaluations/toggle-leader-access/{$leaderRole->id}", [
+            'access_type' => 'weekly',
+        ]);
+
+        $this->assertFalse((bool)$leaderRole->fresh()->can_evaluate_weekly);
+
+        // Leader attempts to create a weekly evaluation -> 403 Forbidden
+        $response = $this->actingAs($leader)->post('/evaluations', [
+            'feraa_id' => $leaderRole->feraa_id,
+            'type' => 'weekly',
+            'week_date' => '2026-05-10',
+            'is_active' => true,
+        ]);
+
+        $response->assertStatus(403);
+    }
 }
