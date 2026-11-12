@@ -13,6 +13,7 @@ import {
     CalendarDaysIcon,
     ChatBubbleLeftRightIcon,
     ShieldCheckIcon,
+    AdjustmentsHorizontalIcon,
     ArrowRightOnRectangleIcon,
     Bars3Icon,
     XMarkIcon,
@@ -41,6 +42,7 @@ export default function AuthenticatedLayout({ header, children, actionButton }) 
         { name: 'Schedule', href: route('calendar'), icon: CalendarDaysIcon, show: true },
         { name: 'Group Chat', href: route('messages.index'), icon: ChatBubbleLeftRightIcon, show: true },
         { name: 'Roles & Access', href: route('roles.index'), icon: ShieldCheckIcon, show: isSuperAdmin },
+        { name: 'Filament Admin', href: '/admin', icon: AdjustmentsHorizontalIcon, show: isSupervisorOrAbove, external: true },
     ].filter((item) => item.show);
 
     const handleLogout = (e) => {
@@ -92,16 +94,23 @@ export default function AuthenticatedLayout({ header, children, actionButton }) 
                     {navigation.map((item) => {
                         const active = window.location.pathname === new URL(item.href, window.location.origin).pathname;
                         const Icon = item.icon;
+                        const navClass = `flex items-center px-3 py-2.5 text-xs font-semibold rounded-2xl transition-all ${
+                            active
+                                ? 'bg-[#6B21A8] text-white shadow-sm shadow-purple-900/20'
+                                : 'text-slate-600 hover:text-scout-900 hover:bg-purple-50/70'
+                        }`;
+
+                        if (item.external) {
+                            return (
+                                <a key={item.name} href={item.href} className={navClass}>
+                                    <Icon className={`h-4 w-4 mr-3 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} />
+                                    {item.name}
+                                </a>
+                            );
+                        }
+
                         return (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className={`flex items-center px-3 py-2.5 text-xs font-semibold rounded-2xl transition-all ${
-                                    active
-                                        ? 'bg-[#6B21A8] text-white shadow-sm shadow-purple-900/20'
-                                        : 'text-slate-600 hover:text-scout-900 hover:bg-purple-50/70'
-                                }`}
-                            >
+                            <Link key={item.name} href={item.href} className={navClass}>
                                 <Icon className={`h-4 w-4 mr-3 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} />
                                 {item.name}
                             </Link>
@@ -162,16 +171,32 @@ export default function AuthenticatedLayout({ header, children, actionButton }) 
                             {navigation.map((item) => {
                                 const active = window.location.pathname === new URL(item.href, window.location.origin).pathname;
                                 const Icon = item.icon;
+                                const mClass = `flex items-center px-4 py-2.5 text-sm font-semibold rounded-2xl ${
+                                    active
+                                        ? 'bg-[#6B21A8] text-white'
+                                        : 'text-slate-700 hover:bg-purple-50'
+                                }`;
+
+                                if (item.external) {
+                                    return (
+                                        <a
+                                            key={item.name}
+                                            href={item.href}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className={mClass}
+                                        >
+                                            <Icon className="h-4 w-4 mr-3" />
+                                            {item.name}
+                                        </a>
+                                    );
+                                }
+
                                 return (
                                     <Link
                                         key={item.name}
                                         href={item.href}
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className={`flex items-center px-4 py-2.5 text-sm font-semibold rounded-2xl ${
-                                            active
-                                                ? 'bg-[#6B21A8] text-white'
-                                                : 'text-slate-700 hover:bg-purple-50'
-                                        }`}
+                                        className={mClass}
                                     >
                                         <Icon className="h-4 w-4 mr-3" />
                                         {item.name}
@@ -275,3 +300,4 @@ export default function AuthenticatedLayout({ header, children, actionButton }) 
         </div>
     );
 }
+

@@ -62,3 +62,4 @@ class RoleController extends Controller
         return back()->with('success', 'Role removed successfully.');
     }
 }
+

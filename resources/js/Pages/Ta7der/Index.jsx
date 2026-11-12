@@ -162,3 +162,4 @@ export default function Ta7derIndex({ ta7ders, myFeraas = [] }) {
         </AuthenticatedLayout>
     );
 }
+

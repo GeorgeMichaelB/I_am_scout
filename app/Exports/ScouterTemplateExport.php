@@ -80,3 +80,4 @@ class ScouterTemplateExport implements FromArray, WithHeadings, WithStyles
         ];
     }
 }
+

@@ -275,3 +275,4 @@ export default function EvaluationsShow({ evaluation, scouterEntries = [] }) {
         </AuthenticatedLayout>
     );
 }
+

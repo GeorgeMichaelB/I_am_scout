@@ -104,3 +104,4 @@ class ScouterImport implements ToCollection, WithHeadingRow
         }
     }
 }
+

@@ -324,3 +324,4 @@ export default function SectionsShow({ section, availableLeaders = [] }) {
         </AuthenticatedLayout>
     );
 }
+

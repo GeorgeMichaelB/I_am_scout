@@ -229,3 +229,4 @@ export default function RolesIndex({ users, sections = [] }) {
         </AuthenticatedLayout>
     );
 }
+

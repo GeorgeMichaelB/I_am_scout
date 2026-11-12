@@ -64,3 +64,4 @@ class FeraaController extends Controller
         return back()->with('success', 'Leader removed from this Fera\'a.');
     }
 }
+

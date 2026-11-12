@@ -68,3 +68,4 @@ class MessageController extends Controller
         return back();
     }
 }
+

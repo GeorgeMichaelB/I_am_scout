@@ -93,3 +93,4 @@ class EventController extends Controller
         return back()->with('success', 'Event removed.');
     }
 }
+

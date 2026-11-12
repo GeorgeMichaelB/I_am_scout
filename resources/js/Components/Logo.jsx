@@ -17,3 +17,4 @@ export default function Logo({ className = "h-12 w-auto", showText = false, text
         </div>
     );
 }
+

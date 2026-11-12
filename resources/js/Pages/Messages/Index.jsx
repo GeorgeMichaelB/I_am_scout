@@ -165,3 +165,4 @@ export default function MessagesIndex({ availableFeraas = [], activeFeraa = null
         </AuthenticatedLayout>
     );
 }
+

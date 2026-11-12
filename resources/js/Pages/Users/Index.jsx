@@ -273,3 +273,4 @@ export default function UsersIndex({ users, sections = [], filters = {} }) {
         </AuthenticatedLayout>
     );
 }
+

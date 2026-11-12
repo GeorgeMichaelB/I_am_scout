@@ -11,3 +11,4 @@ export default function Card({ children, className = '', padding = 'p-6', hover 
         </div>
     );
 }
+

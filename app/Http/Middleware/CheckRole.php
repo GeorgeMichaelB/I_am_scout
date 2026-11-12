@@ -36,3 +36,4 @@ class CheckRole
         abort(403, 'Unauthorized access for your role.');
     }
 }
+

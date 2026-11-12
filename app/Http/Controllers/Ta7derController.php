@@ -58,3 +58,4 @@ class Ta7derController extends Controller
         return back()->with('success', 'Ta7der submitted successfully.');
     }
 }
+

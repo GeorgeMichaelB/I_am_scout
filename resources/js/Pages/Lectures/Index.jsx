@@ -211,3 +211,4 @@ export default function LecturesIndex({ lectures, sections = [] }) {
         </AuthenticatedLayout>
     );
 }
+

@@ -54,3 +54,4 @@ export function route(name, params = {}, absolute = false) {
 if (typeof window !== 'undefined') {
     window.route = route;
 }
+

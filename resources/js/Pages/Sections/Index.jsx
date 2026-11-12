@@ -68,3 +68,4 @@ export default function SectionsIndex({ sections = [] }) {
         </AuthenticatedLayout>
     );
 }
+
