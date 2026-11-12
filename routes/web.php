@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
     // Sections & Feraas
     Route::get('/sections', [SectionController::class, 'index'])->name('sections.index');
     Route::get('/sections/{section}', [SectionController::class, 'show'])->name('sections.show');
+    Route::post('/sections/{section}/assign-supervisor', [SectionController::class, 'assignSupervisor'])->name('sections.assign-supervisor');
+    Route::delete('/sections/{section}/supervisor/{user}', [SectionController::class, 'removeSupervisor'])->name('sections.remove-supervisor');
     Route::post('/sections/{section}/feraas', [FeraaController::class, 'store'])->name('feraas.store');
     Route::put('/feraas/{feraa}', [FeraaController::class, 'update'])->name('feraas.update');
     Route::delete('/feraas/{feraa}', [FeraaController::class, 'destroy'])->name('feraas.destroy');
@@ -49,6 +51,7 @@ Route::middleware('auth')->group(function () {
     // Roles (Super Admin)
     Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
     Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::post('/roles/upgrade-downgrade/{user}', [RoleController::class, 'upgradeDowngrade'])->name('roles.upgrade-downgrade');
     Route::delete('/roles/{userRole}', [RoleController::class, 'destroy'])->name('roles.destroy');
 
     // Lectures

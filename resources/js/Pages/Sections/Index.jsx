@@ -2,19 +2,18 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import Card from '../../Components/Card';
-import Button from '../../Components/Button';
 import Badge from '../../Components/Badge';
-import { ArrowUpRightIcon, Squares2X2Icon, UsersIcon } from '@heroicons/react/24/outline';
+import { ArrowUpRightIcon, UsersIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 
 export default function SectionsIndex({ sections = [] }) {
     return (
         <AuthenticatedLayout header="Scout Sections">
             <Head title="Sections" />
 
-            <div className="space-y-6">
+            <div className="space-y-6 max-w-6xl mx-auto">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <p className="text-sm text-slate-500">
-                        8 core sections of our scout troop with their respective Fera'as, leaders, and scouters.
+                        8 core scout groups. Every group contains many Fera'a, an assigned Section Supervisor, and Fera'a Leaders.
                     </p>
                 </div>
 
@@ -22,6 +21,7 @@ export default function SectionsIndex({ sections = [] }) {
                     {sections.map((section, idx) => {
                         const totalScouters = section.feraas?.reduce((acc, f) => acc + (f.scouters_count || 0), 0) || 0;
                         const totalLeaders = section.feraas?.reduce((acc, f) => acc + (f.leaders_count || 0), 0) || 0;
+                        const supervisor = section.user_roles?.find((r) => r.role === 'supervisor')?.user;
 
                         return (
                             <Link key={section.id} href={route('sections.show', section.id)}>
@@ -46,10 +46,23 @@ export default function SectionsIndex({ sections = [] }) {
                                         <p className="text-xs text-slate-400 mt-1 font-mono uppercase">
                                             /{section.slug}
                                         </p>
+
+                                        {/* Section Supervisor Indicator */}
+                                        <div className="mt-3 pt-3 border-t border-purple-50">
+                                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                                                Supervisor
+                                            </span>
+                                            <span className="text-xs font-bold text-slate-800 flex items-center mt-0.5">
+                                                <ShieldCheckIcon className="h-3.5 w-3.5 mr-1 text-purple-600 shrink-0" />
+                                                <span className="truncate">
+                                                    {supervisor?.full_name || 'Unassigned'}
+                                                </span>
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                                        <div className="flex items-center space-x-3 text-slate-500 font-semibold">
+                                    <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                        <div className="flex items-center space-x-2 text-slate-500 font-semibold">
                                             <span className="flex items-center">
                                                 <UsersIcon className="h-3.5 w-3.5 mr-1 text-scout-700" />
                                                 {totalScouters} Scouters
@@ -68,4 +81,3 @@ export default function SectionsIndex({ sections = [] }) {
         </AuthenticatedLayout>
     );
 }
-
